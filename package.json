@@ -1,0 +1,46 @@
+{
+  "name": "express_vercel_demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=production ts-node --transpile-only index.ts",
+    "dev": "cross-env NODE_ENV=development nodemon index.ts",
+    "vercel-build": "echo hello",
+    "db:generate": "cross-env NODE_ENV=production drizzle-kit generate",
+    "db:drop": "cross-env NODE_ENV=production drizzle-kit drop",
+    "db:migrate": "cross-env NODE_ENV=production drizzle-kit migrate",
+    "db:studio": "cross-env NODE_ENV=production drizzle-kit studio",
+    "dev:generate": "cross-env NODE_ENV=development drizzle-kit generate",
+    "dev:drop": "cross-env NODE_ENV=development drizzle-kit drop",
+    "dev:migrate": "cross-env NODE_ENV=development drizzle-kit migrate",
+    "dev:studio": "cross-env NODE_ENV=development drizzle-kit studio",
+    "dev:run": "cross-env NODE_ENV=development ts-node ./main.ts",
+    "prd:run": "cross-env NODE_ENV=production ts-node ./main.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@libsql/client": "^0.15.4",
+    "drizzle-orm": "^0.43.1",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "gray-matter": "^4.0.3",
+    "multer": "1.4.5-lts.2",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^22.13.8",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.5.0",
+    "drizzle-kit": "^0.31.1",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.8.2"
+  },
+  "packageManager": "pnpm@10.10.0+sha1.f657bc37aa5e08da2ecff3877fe3bbb4b13703ba"
+}
