@@ -15,18 +15,24 @@ interface RequestWithFile extends Request {
 
 const router = Router();
 
-router.get("/", async (req: Request, res: Response) => {
+router.get("/:id", async (req: RequestParams<{ id?: string }>, res: Response) => {
     try {
-        const posts = await db.query.PostTable.findMany({});
-        const data = posts.map((post) => {
-            if (post.content) {
-                return {
-                    ...post,
-                    content: post.content.toString(),
-                };
-            }
-            return post;
+        const id = parseInt(req.params?.id + "", 10);
+        if (!req.params.id || Number.isNaN(id)) {
+            res.status(400).json({ success: false, message: "Invalid ID format" });
+            return;
+        }
+        const posts = await db.query.PostTable.findMany({
+            where: eq(PostTable.id, id),
         });
+        if (!Array.isArray(posts) || posts.length === 0) {
+            res.status(404).json({ success: false, message: "Post not found" });
+            return;
+        }
+        const data = {
+            ...posts[0],
+            content: posts[0]?.content?.toString() ?? "",
+        };
         res.status(200).json({ success: true, message: "", data });
     } catch (error: any) {
         res.status(500).json({ success: false, message: error?.message ?? "Unknown Error" });
