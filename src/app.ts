@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import * as path from "path";
 // routes
 import indexRoute from "./routes/index";
@@ -14,7 +15,17 @@ app.set("views", path.resolve(process.cwd(), "views"));
 app.set("view engine", "ejs");
 
 // 中間件設定
+const origin =
+    process.env.NODE_ENV === "production"
+        ? process.env.WHITE_LIST_ORIGIN!.split(",").map((item) => item.trim())
+        : undefined;
 app.use(express.json());
+app.use(
+    cors({
+        credentials: true,
+        origin,
+    })
+);
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.resolve(process.cwd(), "public")));
 
