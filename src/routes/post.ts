@@ -3,7 +3,8 @@ import { db } from "../drizzle/db";
 import matter from "gray-matter";
 import { PostTable } from "@/drizzle/schema";
 import upload from "../modules/upload";
-import { eq, like, and, desc, asc, sql } from "drizzle-orm";
+import { eq, and, desc, asc, sql } from "drizzle-orm";
+import { passwordAuth } from "@/modules/auth";
 // types
 import type { Request, Response } from "express";
 import type { Frontmatter, RequestParams, RequestQuery } from "~/types";
@@ -40,7 +41,7 @@ router.get("/:id", async (req: RequestParams<{ id?: string }>, res: Response) =>
 });
 
 // POST 方法用於創建新的文章
-router.post("/", upload.single("markdown"), async (req: RequestWithFile, res: Response) => {
+router.post("/", passwordAuth, upload.single("markdown"), async (req: RequestWithFile, res: Response) => {
     try {
         if (!req.file) {
             res.status(400).json({
@@ -81,7 +82,7 @@ router.post("/", upload.single("markdown"), async (req: RequestWithFile, res: Re
 });
 
 // DELETE 方法用於刪除指定 id 的文章
-router.delete("/:id", async (req: RequestParams<{ id: string }>, res) => {
+router.delete("/:id", passwordAuth, async (req: RequestParams<{ id: string }>, res: Response) => {
     try {
         const id = parseInt(req.params.id, 10);
 
