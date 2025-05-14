@@ -5,10 +5,10 @@ import * as path from "path";
 import indexRoute from "./routes/index";
 import postRoute from "./routes/post";
 // types
-import type { Express, Request, Response } from "express";
+import type { Request, Response } from "express";
 
 // 建立 Express 應用
-const app: Express = express();
+const app = express();
 
 // 模板引擎設定
 app.set("views", path.resolve(process.cwd(), "views"));
