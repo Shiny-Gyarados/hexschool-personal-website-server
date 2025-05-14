@@ -1,4 +1,4 @@
-import clearTableData from "@/scripts/clearTableData";
+import clearTableData from "./src/scripts/clearTableData";
 
 async function main() {
     try {

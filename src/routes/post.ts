@@ -1,10 +1,10 @@
 import { Router } from "express";
 import { db } from "../drizzle/db";
 import matter from "gray-matter";
-import { PostTable } from "@/drizzle/schema";
+import { PostTable } from "../drizzle/schema";
 import upload from "../modules/upload";
 import { eq, and, desc, asc, sql } from "drizzle-orm";
-import { passwordAuth } from "@/modules/auth";
+import { passwordAuth } from "../modules/auth";
 // types
 import type { Request, Response } from "express";
 import type { Frontmatter, RequestParams, RequestQuery } from "~/types";
