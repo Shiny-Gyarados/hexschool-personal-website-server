@@ -16,7 +16,7 @@ interface RequestWithFile extends Request {
 
 const router = Router();
 
-router.get("/:id", async (req: RequestParams<{ id?: string }>, res: Response) => {
+router.get("/article/:id", async (req: RequestParams<{ id?: string }>, res: Response) => {
     try {
         const id = parseInt(req.params?.id + "", 10);
         if (!req.params.id || Number.isNaN(id)) {
