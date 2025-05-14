@@ -15,10 +15,7 @@ app.set("views", path.resolve(process.cwd(), "views"));
 app.set("view engine", "ejs");
 
 // 中間件設定
-const origin =
-    process.env.NODE_ENV === "production"
-        ? process.env.WHITE_LIST_ORIGIN!.split(",").map((item) => item.trim())
-        : undefined;
+const origin = process.env.WHITE_LIST_ORIGIN!.split(",").map((item) => item.trim());
 app.use(express.json());
 app.use(
     cors({
