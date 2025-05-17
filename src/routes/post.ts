@@ -3,7 +3,7 @@ import { db } from "../drizzle/db";
 import matter from "gray-matter";
 import { PostTable } from "../drizzle/schema";
 import upload from "../modules/upload";
-import { eq, and, desc, asc, sql } from "drizzle-orm";
+import { eq, and, desc, asc, sql, or } from "drizzle-orm";
 import { passwordAuth } from "../modules/auth";
 // types
 import type { Request, Response } from "express";
@@ -127,6 +127,8 @@ router.get(
             page?: string;
             limit?: string;
             title?: string;
+            description?: string;
+            search?: string;
             category?: string;
             tag?: string;
             sort?: string;
@@ -139,6 +141,8 @@ router.get(
             const limit = parseInt(req.query.limit || "10", 10);
             const offset = (page - 1) * limit;
             const title = req.query.title;
+            const description = req.query.description;
+            const search = req.query.search;
             const category = req.query.category;
             const tag = req.query.tag;
             const sortField = req.query.sort || "id";
@@ -149,6 +153,17 @@ router.get(
 
             if (title) {
                 whereConditions.push(sql`json_extract(${PostTable.frontmatter}, '$.title') LIKE ${"%" + title + "%"}`);
+            }
+
+            if (description) {
+                whereConditions.push(sql`json_extract(${PostTable.frontmatter}, '$.description') LIKE ${"%" + description + "%"}`);
+            }
+
+            if (search) {
+                whereConditions.push(or(
+                    sql`json_extract(${PostTable.frontmatter}, '$.title') LIKE ${"%" + search + "%"}`,
+                    sql`json_extract(${PostTable.frontmatter}, '$.description') LIKE ${"%" + search + "%"}`,
+                ));
             }
 
             if (category) {
