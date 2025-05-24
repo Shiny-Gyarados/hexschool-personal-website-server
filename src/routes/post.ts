@@ -3,7 +3,7 @@ import { db } from "../drizzle/db";
 import matter from "gray-matter";
 import { PostTable } from "../drizzle/schema";
 import upload from "../modules/upload";
-import { eq, and, desc, asc, sql, or } from "drizzle-orm";
+import { eq, and, desc, asc, sql, or, lt, gt } from "drizzle-orm";
 import { passwordAuth } from "../modules/auth";
 // types
 import type { Request, Response } from "express";
@@ -23,16 +23,42 @@ router.get("/article/:id", async (req: RequestParams<{ id?: string }>, res: Resp
             res.status(400).json({ success: false, message: "Invalid ID format" });
             return;
         }
-        const posts = await db.query.PostTable.findMany({
-            where: eq(PostTable.id, id),
-        });
+
+        // 使用 Promise.all 同時執行三個查詢
+        const [posts, prevPost, nextPost] = await Promise.all([
+            // 查詢當前文章
+            db.query.PostTable.findMany({
+                where: eq(PostTable.id, id),
+            }),
+            // 查詢前一篇文章
+            db
+                .select({ id: PostTable.id })
+                .from(PostTable)
+                .where(lt(PostTable.id, id))
+                .orderBy(desc(PostTable.id))
+                .limit(1),
+            // 查詢後一篇文章
+            db
+                .select({ id: PostTable.id })
+                .from(PostTable)
+                .where(gt(PostTable.id, id))
+                .orderBy(asc(PostTable.id))
+                .limit(1),
+        ]);
+
         if (!Array.isArray(posts) || posts.length === 0) {
             res.status(404).json({ success: false, message: "Post not found" });
             return;
         }
+
+        const prevId = prevPost.length > 0 ? prevPost[0].id : null;
+        const nextId = nextPost.length > 0 ? nextPost[0].id : null;
+
         const data = {
             ...posts[0],
             content: posts[0]?.content?.toString() ?? "",
+            prevId,
+            nextId,
         };
         res.status(200).json({ success: true, message: "", data });
     } catch (error: any) {
@@ -156,14 +182,18 @@ router.get(
             }
 
             if (description) {
-                whereConditions.push(sql`json_extract(${PostTable.frontmatter}, '$.description') LIKE ${"%" + description + "%"}`);
+                whereConditions.push(
+                    sql`json_extract(${PostTable.frontmatter}, '$.description') LIKE ${"%" + description + "%"}`
+                );
             }
 
             if (search) {
-                whereConditions.push(or(
-                    sql`json_extract(${PostTable.frontmatter}, '$.title') LIKE ${"%" + search + "%"}`,
-                    sql`json_extract(${PostTable.frontmatter}, '$.description') LIKE ${"%" + search + "%"}`,
-                ));
+                whereConditions.push(
+                    or(
+                        sql`json_extract(${PostTable.frontmatter}, '$.title') LIKE ${"%" + search + "%"}`,
+                        sql`json_extract(${PostTable.frontmatter}, '$.description') LIKE ${"%" + search + "%"}`
+                    )
+                );
             }
 
             if (category) {
